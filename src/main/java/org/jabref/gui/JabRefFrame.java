@@ -48,6 +48,8 @@ import javafx.stage.Stage;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
+import org.jabref.L3info.Difference;
+import org.jabref.L3info.Union;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -122,6 +124,7 @@ import org.jabref.gui.undo.UndoRedoAction;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.ThemeLoader;
+
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
@@ -133,6 +136,7 @@ import org.jabref.logic.undo.AddUndoableActionEvent;
 import org.jabref.logic.undo.UndoChangeEvent;
 import org.jabref.logic.undo.UndoRedoEvent;
 import org.jabref.logic.util.io.FileUtil;
+
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.shared.DatabaseLocation;
@@ -145,6 +149,7 @@ import org.jabref.preferences.LastFocusedTabPreferences;
 
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
+import de.saxsys.mvvmfx.utils.commands.Command;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.TaskProgressView;
 import org.slf4j.Logger;
@@ -420,7 +425,7 @@ public class JabRefFrame extends BorderPane {
                     Localization.lang("Waiting for background tasks to finish. Quit anyway?"),
                     stateManager
             );
-            if (!(shouldClose.isPresent() && shouldClose.get() == ButtonType.YES)) {
+            if (!(shouldClose.isPresent() && (shouldClose.get() == ButtonType.YES))) {
                 return false;
             }
         }
@@ -715,6 +720,7 @@ public class JabRefFrame extends BorderPane {
         Menu tools = new Menu(Localization.lang("Tools"));
         Menu options = new Menu(Localization.lang("Options"));
         Menu help = new Menu(Localization.lang("Help"));
+        Menu projet = new Menu(Localization.lang("Projet"));
 
         file.getItems().addAll(
                 factory.createSubMenu(StandardActions.NEW_LIBRARY,
@@ -935,6 +941,16 @@ public class JabRefFrame extends BorderPane {
                 ),
                 factory.createMenuItem(StandardActions.ABOUT, new AboutAction())
         );
+/*Projet L3info Erwann Forgez*/
+        projet.getItems().addAll(
+
+                               factory.createMenuItem(StandardActions.PROJET_UNION, (Command) new Union(this, dialogService, stateManager)),
+
+                               new SeparatorMenuItem(),
+
+                              factory.createMenuItem(StandardActions.PROJET_DIFF, (Command) new Difference(this, dialogService, stateManager))
+
+                       );
 
         // @formatter:on
         MenuBar menu = new MenuBar();
@@ -948,7 +964,8 @@ public class JabRefFrame extends BorderPane {
                 tools,
                 view,
                 options,
-                help);
+                               help,
+                               projet);
         menu.setUseSystemMenuBar(true);
         return menu;
     }
